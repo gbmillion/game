@@ -10,6 +10,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+int trap(int * hpp){
+	time_t t;
+	srand((unsigned) time(&t));
+	int hp = *hpp,dmg=0;
+	dmg = rand() % 10;
+	hp = hp - dmg;
+	printf("You have stepped on a trap, %d damage.\n", dmg);
+}
 int combat(int * hpp, int monster_hp){
 	time_t t;
 	int hit_dmg=0, hp = *hpp;
@@ -64,6 +72,7 @@ int main(void) {
 	i=0, e = 0; //set starting position
 	while (1){
 		c = getchar();
+		//each movement has a 30 percent chance of hitting a trap
 		switch(c){
 		case 'a':
 			//move in grid
@@ -72,6 +81,8 @@ int main(void) {
 			printf("You have went left[w,a,s,d].\n");
 			if(map[e][i]>0){
 				combat(&health,map[e][i]);
+			} else {
+				if (rand() % 100 < 30) trap(&health);
 			}
 			break;
 		case 's':
@@ -79,6 +90,8 @@ int main(void) {
 			printf("You have gone back[w,a,s,d].\n");
 			if(map[e][i]>0){
 				combat(&health,map[e][i]);
+			}else {
+				if (rand() % 100 < 30) trap(&health);
 			}
 			break;
 		case 'd':
@@ -86,6 +99,8 @@ int main(void) {
 			printf("You have gone right[w,a,s,d].\n");
 			if(map[e][i]>0){
 				combat(&health,map[e][i]);
+			}else {
+				if (rand() % 100 < 30) trap(&health);
 			}
 			break;
 		case 'w':
@@ -93,6 +108,8 @@ int main(void) {
 			printf("You have gone forward[w,a,s,d].\n");
 			if(map[e][i]>0){
 				combat(&health,map[e][i]);
+			}else {
+				if (rand() % 100 < 30) trap(&health);
 			}
 			break;
 		default:
