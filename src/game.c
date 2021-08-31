@@ -10,6 +10,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "class.h"
+int gen_char(struct class toon){
+	time_t t;
+	srand((unsigned) time(&t));
+	printf("Generating you player.\n");
+	toon.Charisma=rand() % 10 ;
+	toon.Dexterity=rand() % 10 ;
+	toon.Stamina=rand() % 10 ;
+	toon.Wisdom=rand() % 10 ;
+	toon.Strength=rand() % 10 ;
+	toon.Intelligence=rand() % 10 ;
+	toon.Agility=rand() % 10 ;
+	toon.hp=100+rand() % 10 ;
+	toon.mana=100+rand() % 10 ;
+	printf("What would you like your class to be called?\n");
+	fgets(toon.name, 25, stdin);
+}
 int trap(int * hpp){
 	time_t t;
 	srand((unsigned) time(&t));
@@ -67,6 +84,9 @@ int main(void) {
 			}
 		}
 	}
+	printf("\n");
+	struct class toon;
+	gen_char(toon);
 	int c = 0;
 	//main game loop
 	i=0, e = 0; //set starting position
