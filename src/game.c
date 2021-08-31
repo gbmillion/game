@@ -24,6 +24,7 @@ void gen_char(struct class *toon);
 void combat(int * hpp, int monster_hp);
 void itemdb( struct item db[255]);
 void use(struct class * player);
+void potion( int * trait, int buff);
 int main(void) {
 	int map[10][10];
 	int i=0, e = 0;
@@ -212,7 +213,7 @@ void combat(int * hpp, int monster_hp){
 void itemdb( struct item db[255])
 {
 	int i=0,c,comma=0,letter=0;
-    const char* fname = "item.csv";
+    const char* fname = "item.db";
     FILE* fp = fopen(fname, "r");
     if(!fp) {
         perror("Failed to load item db.\n");
@@ -263,9 +264,27 @@ void itemdb( struct item db[255])
     fclose(fp);
 }
 void use(struct class * player){
-	int c=0;
+	int i=0,c=0;
+	time_t t;
+
+	srand((unsigned) time(&t));
 	printf("What inventory item do you wish to use?\n");
 	c = getc(stdin);
+	c = getchar();// i don't know why both of these lines are need but it wont grab a char if they're not there
+	c = c-48;
+	int item_type = player->inventory[c].amount - 48;
 
-	printf("%c\nYou use a %s, which increases your %s by %d points.\n",c,player->inventory[c].type,player->inventory[c].trait,player->inventory[c].amount);
+#if defined DEBUG_STATE
+	printf("%d - 48 = %d",player->inventory[c].amount,item_type);
+#endif
+	if(item_type == 1) {
+
+		i= rand() % 3;
+		potion(&player->Agility,i);
+		printf("You use a %s, which increases your %s by %d points.\n",player->inventory[c].type,player->inventory[c].trait,i);
+	}
+}
+
+void potion( int * trait, int buff){
+	trait = trait + buff;
 }
