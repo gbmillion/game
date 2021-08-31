@@ -16,7 +16,7 @@
 int itemdb_size=0;
 struct item db[255];
 
-#define DEBUG_STATE ;
+//#define DEBUG_STATE ;
 void trap(int * hpp);
 void item(struct item invent[100]);
 void step(int * hpp, struct item  play[100]);
@@ -176,7 +176,7 @@ void gen_char(struct class *toon){
 #if defined DEBUG_STATE
 	printf("Your hp is %d \n",toon->hp);
 #endif
-	printf("What would you like your class to be called?\n");
+	printf("What would you like your class to be called(Presets: mage,fighter,healer,rouge)?\n");
 	fgets(toon->clas, 25, stdin);
 	printf("What would you like your character to be called?\n");
 	fgets(toon->name, 25, stdin);
@@ -234,7 +234,8 @@ void combat(int * hpp, int monster_hp, struct class * player){
 		if (player->Agility > rand ()%20){
 			printf("You dodge a blow and are granted an additional attack.\n");
 
-			hit_dmg = player->Strength * rand() % 10 ;
+			//hit_dmg = player->Strength * rand() % 10 ;//i don't know why this is producing a negative number
+			hit_dmg = player->Strength;
 			monster_hp = monster_hp - hit_dmg;
 			printf("You have hit the monster for %d.\n",hit_dmg);
 #if defined DEBUG_STATE
