@@ -8,6 +8,11 @@
 #ifndef CLASS_H_
 #define CLASS_H_
 // maybe add predefined classes at some point
+struct item{
+	char type[255];
+	char trait[255];
+	int amount;
+};
 struct class{
 	char name[25];
 	int Charisma;
@@ -19,6 +24,7 @@ struct class{
 	int Agility;
 	int hp;
 	int mana;
+	struct item inventory[100];
 };
 
 
