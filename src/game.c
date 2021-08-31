@@ -16,13 +16,14 @@
 int itemdb_size=0;
 struct item db[255];
 
-//#define DEBUG_STATE ;
+#define DEBUG_STATE ;
 void trap(int * hpp);
 void item(struct item invent[100]);
 void step(int * hpp, struct item  play[100]);
 void gen_char(struct class *toon);
 void combat(int * hpp, int monster_hp);
 void itemdb( struct item db[255]);
+void use(struct class * player);
 int main(void) {
 	int map[10][10];
 	int i=0, e = 0;
@@ -31,7 +32,7 @@ int main(void) {
 
 	srand((unsigned) time(&t));
 	//build a board with randomly assigned "monster" or value
-	printf("Welcome to dungeon hack!\n");
+	printf("Welcome to dungeon hack!\nCommands: i[inventory],x[exit],u[use]\n");
 	for(i=0;i<10;++i){
 		for(e=0;e<10;++e){
 			//squares have a fifty fifty chance to have a random monster value on them
@@ -53,13 +54,14 @@ int main(void) {
 	gen_char(&player);
 #if defined DEBUG_STATE
 	printf("Your hp is %d \n",player.hp);
+	int x=0;
 #endif
-	int c = 0;
+	int c = 0,in=0;
 	int health=player.hp;
 	//main game loop
 	i=0, e = 0; //set starting position
 #if defined DEBUG_STATE
-	printf("Cheats: i,l\n");
+	printf("Cheats: t[test found items],l[list item db]\n");
 #endif
 	printf("Use the w,a,s,d keys to travel.\n");
 	while (1){
@@ -96,12 +98,24 @@ int main(void) {
 				combat(&health,map[e][i]);
 			}else step(&health,player.inventory);
 			break;
-#if defined DEBUG_STATE
 		case 'i':
+			//list inventory
+			while (player.inventory[in].amount=='1') {
+				printf("%d: %s\n",in,player.inventory[in].type);
+				in++;
+			}
+			in=0;
+			break;
+		case 'x':
+			exit(0);
+		case 'u':
+			use(&player);
+			break;
+#if defined DEBUG_STATE
+		case 't':
 			item(player.inventory);
 			break;
 		case 'l':
-			int x=0;
 			while (x<=itemdb_size){
 				printf("%s,%s,%d\n",db[x].trait,db[x].type,db[x].amount);
 				x++;
@@ -129,16 +143,16 @@ void item(struct item invent[100]){
 	int i=0;
 	srand((unsigned) time(&t));
 	int item=rand() % itemdb_size;
-	while (invent[i].amount==1){
+	while (invent[i].amount=='1'){
 		i++;
 	}
 	strcpy(invent[i].trait,db[item].trait);
 	strcpy(invent[i].type,db[item].type);
 	invent[i].amount=db[item].amount;
+	printf("You have found a  %s.\n",invent[i].type);
 #if defined DEBUG_STATE
-	printf("%s\n",invent[i].trait);
+	printf("%s\n%d\n",invent[i].trait,i);
 #endif
-	printf("You have found an item.\n");
 }
 void step(int * hpp, struct item play[100]){
 	time_t t;
@@ -211,10 +225,10 @@ void itemdb( struct item db[255])
     	  putchar(c); //load item db
 #endif
     	   if (comma == 0 ) {
-    		   db[i].trait[letter]=c;
+    		   db[i].type[letter]=c;
     		   letter++;
     	   } else if (comma == 1){
-    		   db[i].type[letter]=c;
+    		   db[i].trait[letter]=c;
     		   letter++;
     	   } else if (comma == 2){
     		   db[i].amount=c;
@@ -247,4 +261,11 @@ void itemdb( struct item db[255])
 #endif
     }
     fclose(fp);
+}
+void use(struct class * player){
+	int c=0;
+	printf("What inventory item do you wish to use?\n");
+	c = getc(stdin);
+
+	printf("%c\nYou use a %s, which increases your %s by %d points.\n",c,player->inventory[c].type,player->inventory[c].trait,player->inventory[c].amount);
 }
