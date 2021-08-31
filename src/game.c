@@ -176,8 +176,11 @@ void gen_char(struct class *toon){
 #if defined DEBUG_STATE
 	printf("Your hp is %d \n",toon->hp);
 #endif
+	printf("What would you like your class to be called?\n");
+	fgets(toon->clas, 25, stdin);
 	printf("What would you like your character to be called?\n");
 	fgets(toon->name, 25, stdin);
+	load_clas(toon);
 }
 void combat(int * hpp, int monster_hp, struct class * player){
 	time_t t;
@@ -325,3 +328,4 @@ void use(struct class * player){
 void potion( int * trait, int buff){
 	trait = trait + buff;
 }
+
