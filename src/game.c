@@ -21,7 +21,7 @@ void trap(int * hpp);
 void item(struct item invent[100]);
 void step(int * hpp, struct item  play[100]);
 void gen_char(struct class *toon);
-void combat(int * hpp, int monster_hp);
+void combat(int * hpp, int monster_hp, struct class * player);
 void itemdb( struct item db[255]);
 void use(struct class * player);
 void potion( int * trait, int buff);
@@ -75,28 +75,28 @@ int main(void) {
 			e++;
 			printf("You have went left[w,a,s,d].\n");
 			if(map[e][i]>0){
-				combat(&health,map[e][i]);
+				combat(&health,map[e][i],&player);
 			} else step(&health,player.inventory);
 			break;
 		case 's':
 			i--;
 			printf("You have gone back[w,a,s,d].\n");
 			if(map[e][i]>0){
-				combat(&health,map[e][i]);
+				combat(&health,map[e][i],&player);
 			}else step(&health,player.inventory);
 			break;
 		case 'd':
 			e--;
 			printf("You have gone right[w,a,s,d].\n");
 			if(map[e][i]>0){
-				combat(&health,map[e][i]);
+				combat(&health,map[e][i],&player);
 			}else step(&health,player.inventory);
 			break;
 		case 'w':
 			i++;
 			printf("You have gone forward[w,a,s,d].\n");
 			if(map[e][i]>0){
-				combat(&health,map[e][i]);
+				combat(&health,map[e][i],&player);
 			}else step(&health,player.inventory);
 			break;
 		case 'i':
@@ -165,9 +165,8 @@ void gen_char(struct class *toon){
 	time_t t;
 	srand((unsigned) time(&t));
 	printf("Generating you player.\n");
-	toon->Charisma=rand() % 20 ;
 	toon->Dexterity=rand() % 20 ;
-	toon->Stamina=rand() % 20 ;
+	toon->Stamina=100+rand() % 20 ;
 	toon->Wisdom=rand() % 20 ;
 	toon->Strength=rand() % 20 ;
 	toon->Intelligence=rand() % 20 ;
@@ -180,17 +179,21 @@ void gen_char(struct class *toon){
 	printf("What would you like your character to be called?\n");
 	fgets(toon->name, 25, stdin);
 }
-void combat(int * hpp, int monster_hp){
+void combat(int * hpp, int monster_hp, struct class * player){
 	time_t t;
-	int hit_dmg=0, hp = *hpp;
+	int hit_dmg=0, hp = *hpp, heal=0;
 	srand((unsigned) time(&t));
 	while(monster_hp>0){
 		if (rand() % 100 > 50){
-			//monster hits you
-			hit_dmg = rand() % 10 ;
-			hp = hp - hit_dmg;
-			printf("You have been hit for %d.\n",hit_dmg);
-			hit_dmg=0;
+				//monster hits you
+			if(player->Dexterity < rand() % 20){
+				hit_dmg = rand() % 10 ;
+				hp = hp - hit_dmg;
+				printf("You have been hit for %d.\n",hit_dmg);
+				hit_dmg=0;
+			} else {
+				printf("You jump out of the way, avoiding damage.\n");
+			}
 			if(hp<=0){
 				printf("You have died.\n");
 				exit(0);
@@ -199,14 +202,44 @@ void combat(int * hpp, int monster_hp){
 				printf("Health:%d\n",hp);
 			}
 		} else {
-			//you hit monster
-			hit_dmg = rand() % 10 ;
+			//you hit monster (or heal yourself)
+			if(player->Wisdom < rand()%20){
+				player->Stamina = player->Stamina - 10;
+				if (player->Stamina <= 0 ) hit_dmg = player->Strength * rand() % 5 ;
+					else hit_dmg = player->Strength * rand() % 10 ;
+				// if you're out of stamina you do half damage
+				monster_hp = monster_hp - hit_dmg;
+				printf("You have hit the monster for %d.\n",hit_dmg);
+				hit_dmg=0;
+			} else {
+				heal = rand() % 10;
+				printf("The gods have favor on you, healing you for %d.\n", heal);
+				player->hp = player->hp + heal;
+			}
+		}
+		//cast a spell
+		if(player->Intelligence>rand() % 20 ){
+			if (player->mana > 0){
+				hit_dmg = rand() % 10 ;
+				monster_hp = monster_hp - hit_dmg;
+				printf("Your spell  has hit the monster for %d.\n",hit_dmg);
+				hit_dmg=0;
+				player->mana = player->mana - 10;
+			}
+
+		}
+		if (player->Agility > rand ()%20){
+			printf("You dodge a blow and are granted an additional attack.\n");
+			hit_dmg = player->Strength * rand() % 10 ;
 			monster_hp = monster_hp - hit_dmg;
 			printf("You have hit the monster for %d.\n",hit_dmg);
 			hit_dmg=0;
 		}
 		if(monster_hp<=0){
 			printf("The monster is dead.\n");
+			player->mana = 100;
+			player->Stamina = 100;
+			player->hp=100;
 		}
 	}
 }
