@@ -230,9 +230,13 @@ void combat(int * hpp, int monster_hp, struct class * player){
 		}
 		if (player->Agility > rand ()%20){
 			printf("You dodge a blow and are granted an additional attack.\n");
+
 			hit_dmg = player->Strength * rand() % 10 ;
 			monster_hp = monster_hp - hit_dmg;
 			printf("You have hit the monster for %d.\n",hit_dmg);
+#if defined DEBUG_STATE
+			printf("%d str %d monster_hp %d hit_dmg\n",player->Strength, monster_hp, hit_dmg);
+#endif
 			hit_dmg=0;
 		}
 		if(monster_hp<=0){
