@@ -11,21 +11,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "class.h"
-int gen_char(struct class toon){
+#define DEBUG_STATE 1;
+
+int gen_char(struct class *toon){
 	time_t t;
 	srand((unsigned) time(&t));
 	printf("Generating you player.\n");
-	toon.Charisma=rand() % 10 ;
-	toon.Dexterity=rand() % 10 ;
-	toon.Stamina=rand() % 10 ;
-	toon.Wisdom=rand() % 10 ;
-	toon.Strength=rand() % 10 ;
-	toon.Intelligence=rand() % 10 ;
-	toon.Agility=rand() % 10 ;
-	toon.hp=100+rand() % 10 ;
-	toon.mana=100+rand() % 10 ;
+	toon->Charisma=rand() % 10 ;
+	toon->Dexterity=rand() % 10 ;
+	toon->Stamina=rand() % 10 ;
+	toon->Wisdom=rand() % 10 ;
+	toon->Strength=rand() % 10 ;
+	toon->Intelligence=rand() % 10 ;
+	toon->Agility=rand() % 10 ;
+	toon->hp=100+rand() % 10 ;
+	toon->mana=100+rand() % 10 ;
+#if defined DEBUG_STATE
+	printf("Your hp is %d \n",toon->hp);
+#endif
 	printf("What would you like your class to be called?\n");
-	fgets(toon.name, 25, stdin);
+	fgets(toon->name, 25, stdin);
+	return 0;
 }
 int trap(int * hpp){
 	time_t t;
@@ -34,6 +40,7 @@ int trap(int * hpp){
 	dmg = rand() % 10;
 	hp = hp - dmg;
 	printf("You have stepped on a trap, %d damage.\n", dmg);
+	return 0;
 }
 int combat(int * hpp, int monster_hp){
 	time_t t;
@@ -69,7 +76,7 @@ int combat(int * hpp, int monster_hp){
 int main(void) {
 	int map[10][10];
 	int i=0, e = 0;
-	int health=100;
+
 	time_t t;
 	srand((unsigned) time(&t));
 	//build a board with randomly assigned "monster" or value
@@ -85,9 +92,13 @@ int main(void) {
 		}
 	}
 	printf("\n");
-	struct class toon;
-	gen_char(toon);
+	struct class player;
+	gen_char(&player);
+#if defined DEBUG_STATE
+	printf("Your hp is %d \n",player.hp);
+#endif
 	int c = 0;
+	int health=player.hp;
 	//main game loop
 	i=0, e = 0; //set starting position
 	while (1){
