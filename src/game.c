@@ -12,10 +12,11 @@
 #include <stdlib.h>
 #include "class.h"
 #include <string.h>
+#include <time.h>
 int itemdb_size=0;
 struct item db[255];
 
-#define DEBUG_STATE ;
+//#define DEBUG_STATE ;
 void trap(int * hpp);
 void item(struct item invent[100]);
 void step(int * hpp, struct item  play[100]);
@@ -53,7 +54,7 @@ int main(void) {
 #if defined DEBUG_STATE
 	printf("Your hp is %d \n",player.hp);
 #endif
-	int c = 0,x=0;
+	int c = 0;
 	int health=player.hp;
 	//main game loop
 	i=0, e = 0; //set starting position
@@ -100,6 +101,7 @@ int main(void) {
 			item(player.inventory);
 			break;
 		case 'l':
+			int x=0;
 			while (x<=itemdb_size){
 				printf("%s,%s,%d\n",db[x].trait,db[x].type,db[x].amount);
 				x++;
@@ -134,7 +136,7 @@ void item(struct item invent[100]){
 	strcpy(invent[i].type,db[item].type);
 	invent[i].amount=db[item].amount;
 #if defined DEBUG_STATE
-	printf("%s\n",invent[i].type);
+	printf("%s\n",invent[i].trait);
 #endif
 	printf("You have found an item.\n");
 }
@@ -206,7 +208,7 @@ void itemdb( struct item db[255])
     while ((c = fgetc(fp)) != EOF) { // loop until end of file
        if (c != ','){
 #if defined DEBUG_STATE
-    	   putchar(c); //load item db
+    	  putchar(c); //load item db
 #endif
     	   if (comma == 0 ) {
     		   db[i].trait[letter]=c;
@@ -224,7 +226,10 @@ void itemdb( struct item db[255])
     	   putchar(c); //load item db
 #endif
        }
-       if (c == '\n' ) i++;
+       if (c == '\n' ) {
+    	   comma=0;//forgot this little guy
+    	   i++;
+       }
     }
 #if defined DEBUG_STATE
     printf("%s",db[i].trait);
