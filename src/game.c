@@ -1,10 +1,14 @@
 /*
  ============================================================================
  Name        : game.c
- Author      : brad
- Version     :
- Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Author      : George Million
+ Version     : 1.0
+ Copyright   :  copyrighted 2021
+ Description : randomly genorated 10x10 dungeon crawling game.
+ Features: four playable classes, plus a randomly genorated one of your choice, usable items , dynamic traps,
+ 	 	 	 six character attributes, active combat,
+
+ Bugs: potions don't delete from inventory after use
  ============================================================================
  */
 
@@ -13,10 +17,15 @@
 #include "class.h"
 #include <string.h>
 #include <time.h>
+
+//items database
 int itemdb_size=0;
 struct item db[255];
 
-//#define DEBUG_STATE ;
+//enable debug statements and cheats
+#define DEBUG_STATE ;
+
+//functions
 void trap(int * hpp);
 void item(struct item invent[100]);
 void step(int * hpp, struct item  play[100]);
@@ -25,11 +34,14 @@ void combat(int * hpp, int monster_hp, struct class * player);
 void itemdb( struct item db[255]);
 void use(struct class * player);
 void potion( int * trait, int buff);
+
 int main(void) {
+	//10x10 map
 	int map[10][10];
 	int i=0, e = 0;
 	time_t t;
-	itemdb(db);
+
+	itemdb(db);//load items
 
 	srand((unsigned) time(&t));
 	//build a board with randomly assigned "monster" or value
@@ -38,7 +50,7 @@ int main(void) {
 		for(e=0;e<10;++e){
 			//squares have a fifty fifty chance to have a random monster value on them
 			if (rand() % 100 > 50 ){
-				map[e][i]= rand() % 100;
+				map[e][i]= rand() % 100;//monsters hp up to 100
 #if defined DEBUG_STATE
 				printf("%d",map[e][i]);
 #endif
@@ -52,7 +64,7 @@ int main(void) {
 	printf("\n");
 #endif
 	struct class player;
-	gen_char(&player);
+	gen_char(&player);//genorate player and class
 #if defined DEBUG_STATE
 	printf("Your hp is %d \n",player.hp);
 	int x=0;
@@ -69,9 +81,9 @@ int main(void) {
 		c = getchar();
 		//each movement has a 30 percent chance of hitting a trap
 		switch(c){
+		//move in grid
+		//call combat check
 		case 'a':
-			//move in grid
-			//call combat check
 			e++;
 			printf("You have went left[w,a,s,d].\n");
 			if(map[e][i]>0){
@@ -110,7 +122,7 @@ int main(void) {
 		case 'x':
 			exit(0);
 		case 'u':
-			use(&player);
+			use(&player);//use item in inventory
 			break;
 #if defined DEBUG_STATE
 		case 't':
@@ -138,7 +150,7 @@ void trap(int * hpp){
 	dmg = rand() % 10;
 	hp = hp - dmg;
 	printf("You have stepped on a trap, %d damage.\n", dmg);
-}
+}//just apply trap dmg
 void item(struct item invent[100]){
 	time_t t;
 	int i=0;
@@ -146,10 +158,10 @@ void item(struct item invent[100]){
 	int item=rand() % itemdb_size;
 	while (invent[i].amount=='1'){
 		i++;
-	}
+	}//count items in items db
 	strcpy(invent[i].trait,db[item].trait);
 	strcpy(invent[i].type,db[item].type);
-	invent[i].amount=db[item].amount;
+	invent[i].amount=db[item].amount;//load item into db
 	printf("You have found a  %s.\n",invent[i].type);
 #if defined DEBUG_STATE
 	printf("%s\n%d\n",invent[i].trait,i);
@@ -158,13 +170,14 @@ void item(struct item invent[100]){
 void step(int * hpp, struct item play[100]){
 	time_t t;
 	srand((unsigned) time(&t));
-	if (rand() % 100 < 30) trap(hpp);
-	else if (rand() % 100 > 90) item(play);
+	if (rand() % 100 < 30) trap(hpp);//30% to hit trap
+	else if (rand() % 100 > 90) item(play);//10% chance to get item
 }
 void gen_char(struct class *toon){
 	time_t t;
+	int i=0;
 	srand((unsigned) time(&t));
-	printf("Generating you player.\n");
+	printf("Generating you player.\n");//start off as randomly generated class
 	toon->Dexterity=rand() % 20 ;
 	toon->Stamina=100+rand() % 20 ;
 	toon->Wisdom=rand() % 20 ;
@@ -178,18 +191,24 @@ void gen_char(struct class *toon){
 #endif
 	printf("What would you like your class to be called(Presets: mage,fighter,healer,rouge)?\n");
 	fgets(toon->clas, 25, stdin);
+	while(1){//chop the new line off the clas char
+		if (toon->clas[i]==10){
+			toon->clas[i]=0;
+			break;
+		} else i++;
+	}
 	printf("What would you like your character to be called?\n");
 	fgets(toon->name, 25, stdin);
-	load_clas(toon);
+	load_clas(toon);//apply class template to generated class
 }
 void combat(int * hpp, int monster_hp, struct class * player){
 	time_t t;
 	int hit_dmg=0, hp = *hpp, heal=0;
 	srand((unsigned) time(&t));
-	while(monster_hp>0){
+	while(monster_hp>0){//combat loop until monster dead
 		if (rand() % 100 > 50){
 				//monster hits you
-			if(player->Dexterity < rand() % 20){
+			if(player->Dexterity < rand() % 20){//use dex to determine if you avoid an attack
 				hit_dmg = rand() % 10 ;
 				hp = hp - hit_dmg;
 				printf("You have been hit for %d.\n",hit_dmg);
@@ -197,7 +216,7 @@ void combat(int * hpp, int monster_hp, struct class * player){
 			} else {
 				printf("You jump out of the way, avoiding damage.\n");
 			}
-			if(hp<=0){
+			if(hp<=0){//check players hp & exit if dead
 				printf("You have died.\n");
 				exit(0);
 				break;
@@ -231,7 +250,7 @@ void combat(int * hpp, int monster_hp, struct class * player){
 			}
 
 		}
-		if (player->Agility > rand ()%20){
+		if (player->Agility > rand ()%20){//check agil for chance of additional attack
 			printf("You dodge a blow and are granted an additional attack.\n");
 
 			//hit_dmg = player->Strength * rand() % 10 ;//i don't know why this is producing a negative number
@@ -243,7 +262,7 @@ void combat(int * hpp, int monster_hp, struct class * player){
 #endif
 			hit_dmg=0;
 		}
-		if(monster_hp<=0){
+		if(monster_hp<=0){//you have killed the monster, reset player
 			printf("The monster is dead.\n");
 			player->mana = 100;
 			player->Stamina = 100;
@@ -254,7 +273,7 @@ void combat(int * hpp, int monster_hp, struct class * player){
 void itemdb( struct item db[255])
 {
 	int i=0,c,comma=0,letter=0;
-    const char* fname = "item.db";
+    const char* fname = "item.db";//data base must be in comma separated value list format (may encrypt or encode to prevent editing)
     FILE* fp = fopen(fname, "r");
     if(!fp) {
         perror("Failed to load item db.\n");
@@ -264,8 +283,8 @@ void itemdb( struct item db[255])
     while ((c = fgetc(fp)) != EOF) { // loop until end of file
        if (c != ','){
 #if defined DEBUG_STATE
-    	  putchar(c); //load item db
-#endif
+    	  putchar(c);
+#endif//load item db
     	   if (comma == 0 ) {
     		   db[i].type[letter]=c;
     		   letter++;
@@ -307,26 +326,57 @@ void itemdb( struct item db[255])
 void use(struct class * player){
 	int i=0,c=0;
 	time_t t;
-
+	//use item and call function for right item ID
 	srand((unsigned) time(&t));
 	printf("What inventory item do you wish to use?\n");
 	c = getc(stdin);
 	c = getchar();// i don't know why both of these lines are need but it wont grab a char if they're not there
-	c = c-48;
+	c = c-48;//convert from ascii to decimal
 	int item_type = player->inventory[c].amount - 48;
 
 #if defined DEBUG_STATE
 	printf("%d - 48 = %d",player->inventory[c].amount,item_type);
 #endif
 	if(item_type == 1) {
-
+		//item type one is potions
 		i= rand() % 3;
-		potion(&player->Agility,i);
+		char lhs[255];
+		strcpy(lhs,player->inventory[c].trait);
+		char rhs[255];
+		strcpy(rhs,(char *)"Agility");
+		if( strcmp( &lhs, &rhs ) == 0){
+			potion(&player->Agility,i);
+		}
+		strcpy(rhs,(char *)"Dexterity");
+		if( strcmp( &lhs, &rhs ) == 0){
+			potion(&player->Dexterity,i);
+		}
+		strcpy(rhs,(char *)"Stamina");
+		if( strcmp( &lhs, &rhs ) == 0){
+			potion(&player->Stamina,i);
+		}
+		strcpy(rhs,(char *)"Wisdom");
+		if( strcmp( &lhs, &rhs ) == 0){
+			potion(&player->Wisdom,i);
+		}
+		strcpy(rhs,(char *)"Strength");
+		if( strcmp( &lhs, &rhs ) == 0){
+			potion(&player->Strength,i);
+		}
+		strcpy(rhs,(char *)"Intelligence");
+		if( strcmp( &lhs, &rhs ) == 0){
+			potion(&player->Intelligence,i);
+		}
 		printf("You use a %s, which increases your %s by %d points.\n",player->inventory[c].type,player->inventory[c].trait,i);
+		//remove item from inventory
+		player->inventory[c].trait[0]='\0';
+		player->inventory[c].type[0]='\0';
+
 	}
 }
 
 void potion( int * trait, int buff){
+	//apply potion
 	trait = trait + buff;
 }
 
