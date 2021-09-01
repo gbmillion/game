@@ -23,7 +23,7 @@ int itemdb_size=0;
 struct item db[255];
 
 //enable debug statements and cheats
-#define DEBUG_STATE ;
+//#define DEBUG_STATE ;
 
 //functions
 void trap(int * hpp);

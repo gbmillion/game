@@ -9,7 +9,7 @@
 #define CLASS_H_
 
 #include <string.h>
-#define DEBUG_STATE ;
+//#define DEBUG_STATE ;
 // maybe add predefined classes at some point
 
 struct item{
