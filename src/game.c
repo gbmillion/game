@@ -8,7 +8,7 @@
  Features: four playable classes, plus a randomly genorated one of your choice, usable items , dynamic traps,
  	 	 	 six character attributes, active combat,
 
- Bugs: potions don't delete from inventory after use
+ Bugs:
  ============================================================================
  */
 
