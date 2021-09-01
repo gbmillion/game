@@ -175,7 +175,8 @@ void step(int * hpp, struct item play[100]){
 }
 void gen_char(struct class *toon){
 	time_t t;
-	int i=0;
+	int i=0, n;
+	char num=-1;
 	srand((unsigned) time(&t));
 	printf("Generating you player.\n");//start off as randomly generated class
 	toon->Dexterity=rand() % 20 ;
@@ -191,6 +192,20 @@ void gen_char(struct class *toon){
 #endif
 	printf("What would you like your class to be called(Presets: mage,fighter,healer,rouge)?\n");
 	fgets(toon->clas, 25, stdin);
+	i=0;
+    while (toon->clas[i] != '\n' )//sanitize input to lower case letters only
+    {
+		n = sscanf(&toon->clas[i], "%[a-z]", &num);
+		if (n != 1) {
+			printf("Error! You can only enter lower case letters:\n");
+			fgets(toon->clas, 25, stdin);
+			i=-1;
+			num = -1;
+
+		}
+		i++;
+    }
+    i=0;
 	while(1){//chop the new line off the clas char
 		if (toon->clas[i]==10){
 			toon->clas[i]=0;
@@ -199,6 +214,20 @@ void gen_char(struct class *toon){
 	}
 	printf("What would you like your character to be called?\n");
 	fgets(toon->name, 25, stdin);
+	i=0;
+    while (toon->name[i] != '\n' )//sanitize input to lower case letters only
+    {
+		n = sscanf(&toon->name[i], "%[a-z]", &num);
+		if (n != 1) {
+			printf("Error! You can only enter lower case letters:\n");
+			fgets(toon->clas, 25, stdin);
+			i=-1;
+			num = -1;
+
+		}
+		i++;
+    }
+    i=0;
 	load_clas(toon);//apply class template to generated class
 }
 void combat(int * hpp, int monster_hp, struct class * player){
@@ -344,27 +373,27 @@ void use(struct class * player){
 		strcpy(lhs,player->inventory[c].trait);
 		char rhs[255];
 		strcpy(rhs,(char *)"Agility");
-		if( strcmp( &lhs, &rhs ) == 0){
+		if( strcmp( (char *)&lhs, (char *)&rhs ) == 0){
 			potion(&player->Agility,i);
 		}
 		strcpy(rhs,(char *)"Dexterity");
-		if( strcmp( &lhs, &rhs ) == 0){
+		if( strcmp( (char *)&lhs, (char *)&rhs ) == 0){
 			potion(&player->Dexterity,i);
 		}
 		strcpy(rhs,(char *)"Stamina");
-		if( strcmp( &lhs, &rhs ) == 0){
+		if( strcmp((char *) &lhs,(char *) &rhs ) == 0){
 			potion(&player->Stamina,i);
 		}
 		strcpy(rhs,(char *)"Wisdom");
-		if( strcmp( &lhs, &rhs ) == 0){
+		if( strcmp((char *) &lhs,(char *) &rhs ) == 0){
 			potion(&player->Wisdom,i);
 		}
 		strcpy(rhs,(char *)"Strength");
-		if( strcmp( &lhs, &rhs ) == 0){
+		if( strcmp( (char *)&lhs,(char *) &rhs ) == 0){
 			potion(&player->Strength,i);
 		}
 		strcpy(rhs,(char *)"Intelligence");
-		if( strcmp( &lhs, &rhs ) == 0){
+		if( strcmp((char *) &lhs, (char *)&rhs ) == 0){
 			potion(&player->Intelligence,i);
 		}
 		printf("You use a %s, which increases your %s by %d points.\n",player->inventory[c].type,player->inventory[c].trait,i);

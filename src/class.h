@@ -54,7 +54,7 @@ void load_clas(struct class *toon){//apply predefined class templates
 		printf("Applied mage.\n");
 #endif
 	}
-	strcpy( &class_name, (const char *)"fighter" );
+	strcpy(( char *) &class_name, (const char *)"fighter" );
 	 error=strcmp(  class_name,  toon->clas );
 	#if defined DEBUG_STATE
 		printf("%s equals %s %d : %d\n",class_name,  toon->clas,class_name[4], toon->clas[4]);
@@ -70,7 +70,7 @@ void load_clas(struct class *toon){//apply predefined class templates
 		printf("Applied fighter.\n");
 #endif
 	}
-		strcpy( &class_name, (const char *)"healer");
+		strcpy( ( char *)&class_name, (const char *)"healer");
 	 error=strcmp(  class_name,  toon->clas );
 	#if defined DEBUG_STATE
 		printf("%s equals %s %d : %d\n",class_name,  toon->clas,class_name[4], toon->clas[4]);
@@ -86,7 +86,7 @@ void load_clas(struct class *toon){//apply predefined class templates
 		printf("Applied healer.\n");
 #endif
 	}
-	strcpy( &class_name, (const char *)"rouge" );
+	strcpy( ( char *)&class_name, (const char *)"rouge" );
 	 error=strcmp(  class_name,  toon->clas );
 	#if defined DEBUG_STATE
 		printf("%s equals %s %d : %d\n",class_name,  toon->clas,class_name[4], toon->clas[4]);
