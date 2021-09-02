@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "class.h"
+#include "crypt.h"
 #include <string.h>
 #include <time.h>
 
@@ -408,4 +409,5 @@ void potion( int * trait, int buff){
 	//apply potion
 	trait = trait + buff;
 }
+
 
