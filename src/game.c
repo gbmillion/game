@@ -8,7 +8,7 @@
  Features: four playable classes, plus a randomly genorated one of your choice, usable items , dynamic traps,
  	 	 	 six character attributes, active combat,
 
- Bugs:
+ Bugs: there's a bug in the encryption causing the first line to be corrupted
  ============================================================================
  */
 
@@ -24,7 +24,7 @@ int itemdb_size=0;
 struct item db[255];
 
 //enable debug statements and cheats
-//#define DEBUG_STATE ;
+#define DEBUG_STATE ;
 
 //functions
 void trap(int * hpp);
@@ -304,12 +304,19 @@ void itemdb( struct item db[255])
 {
 	int i=0,c,comma=0,letter=0;
     const char* fname = "item.db";//data base must be in comma separated value list format (may encrypt or encode to prevent editing)
-    FILE* fp = fopen(fname, "r");
+    FILE * fp= fopen(".key", "r");
+    if(!fp) {
+    	encrypt ("item.db");
+    } else {
+    	fclose(fp);
+    }
+    fp = fopen(fname, "r");
     if(!fp) {
         perror("Failed to load item db.\n");
         exit(1);
     }
-
+    decrypt(fname);
+    //need to decrypt db
     while ((c = fgetc(fp)) != EOF) { // loop until end of file
        if (c != ','){
 #if defined DEBUG_STATE

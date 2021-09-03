@@ -29,7 +29,7 @@ int decrypt(char * input){
 	iv_size = (mcrypt_enc_get_iv_size) (crypt);
 	key_size = (mcrypt_enc_get_key_size) (crypt);
 	//load key from file
-	FILE * kfp = fopen("key.txt","r");
+	FILE * kfp = fopen(".key","r");
 	i = fread( key, key_size, 1,kfp);
 	if(i<=0)exit(1);
 	fclose(kfp);
@@ -67,7 +67,7 @@ int encrypt (char * input){
 	int i=0,iv_size=0,key_size=0,c,err=0;
 	unsigned char *buff;
 	const char* fname = input;
-	const char* fname2 = "output.txt";
+	const char* fname2 = ".tmp";
 
 	//pick the crypto  algorithm & mode
 	crypt = mcrypt_module_open("twofish", NULL, "cfb", NULL);
@@ -84,7 +84,7 @@ int encrypt (char * input){
 	mcrypt_generic_init( crypt, key, key_size, buff);
 	if (crypt == MCRYPT_FAILED) exit(1);
 	//save key to file
-	FILE* fp = fopen("key.txt", "w");
+	FILE* fp = fopen("key", "w");
 	if(!fp) {
 		perror("Failed to open key file.\n");
 		exit(1);
@@ -110,6 +110,24 @@ int encrypt (char * input){
     }
     fclose(fp2);
     fclose(fp);
+    //this is where we replace the original with the encrypted version
+	fp = fopen(fname, "w");
+    if(!fp) {
+        perror("Failed to load input file.\n");
+        exit(1);
+    }
+	fp2 = fopen(fname2, "r");
+    if(!fp2) {
+        perror("Failed to load output file.\n");
+        exit(1);
+    }
+    while ((c = fgetc(fp2)) != EOF) {
+    	fputc(c,fp);
+    	if (err != 0)exit(1);
+    }
+    fclose(fp2);
+    fclose(fp);
+
 	return 0;
 }
 
