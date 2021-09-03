@@ -7,7 +7,8 @@
 
 #ifndef CRYPT_H_
 #define CRYPT_H_
-
+//enable debug statements and cheats
+#define DEBUG_STATE
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,13 +24,17 @@ int decrypt(char * input){
 	int i=0,iv_size=0,key_size=0,c,err=0;
 	unsigned char *buff;
 	const char* fname = input;
-	const char* fname2 = "decrypted.txt";
+	const char* fname2 = ".tmp";
 	//select crypto  algorithm & mode
 	crypt = mcrypt_module_open("twofish", NULL, "cfb", NULL);
 	iv_size = (mcrypt_enc_get_iv_size) (crypt);
 	key_size = (mcrypt_enc_get_key_size) (crypt);
 	//load key from file
 	FILE * kfp = fopen(".key","r");
+    if(!kfp) {
+        perror("Failed to load key file.\n");
+        exit(1);
+    }
 	i = fread( key, key_size, 1,kfp);
 	if(i<=0)exit(1);
 	fclose(kfp);
@@ -51,7 +56,13 @@ int decrypt(char * input){
     }
     //loop until end of file for input
     while ((c = fgetc(fp)) != EOF) {
+#if defined DEBUG_STATE
+    	printf("[%d:",c);
+#endif
     	err = mdecrypt_generic( crypt, &c, 1);//decrypt file stream
+#if defined DEBUG_STATE
+    	printf("%d]\n",c);
+#endif
     	fputc(c,fp2);
     	if (err != 0)exit(1);
     }
@@ -84,7 +95,7 @@ int encrypt (char * input){
 	mcrypt_generic_init( crypt, key, key_size, buff);
 	if (crypt == MCRYPT_FAILED) exit(1);
 	//save key to file
-	FILE* fp = fopen("key", "w");
+	FILE* fp = fopen(".key", "w");
 	if(!fp) {
 		perror("Failed to open key file.\n");
 		exit(1);
@@ -104,7 +115,13 @@ int encrypt (char * input){
         exit(1);
     }//loop until end of input file
     while ((c = fgetc(fp)) != EOF) {
+#if defined DEBUG_STATE
+    	printf("[%d:",c);
+#endif
     	err = mcrypt_generic( crypt, &c, 1);//encrypt file stream
+#if defined DEBUG_STATE
+    	printf("%d]\n",c);
+#endif
     	fputc(c,fp2);
     	if (err != 0)exit(1);
     }
